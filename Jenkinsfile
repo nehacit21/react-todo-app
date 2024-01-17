@@ -1,13 +1,12 @@
 pipeline {
     agent any
 
-    }
     stages {
         stage('Stop Deployment') {
             steps {
                 script {
                     // Stop the running deployment using pm2
-                    sh 'npm install -g pm2'
+                    sh 'npm install pm2'
                     sh 'pm2 stop react-todo-app'
                 }
             }
