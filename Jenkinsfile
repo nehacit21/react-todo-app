@@ -9,6 +9,7 @@ pipeline {
             steps {
                 script {
                     // Stop the running deployment using pm2
+                    sh 'pm2 install'
                     sh 'pm2 stop react-todo-app'
                 }
             }
