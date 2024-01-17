@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        export PATH=/usr/bin:$PATH
         export PM2_HOME="/home/nodejs/.pm2"
     }
     stages {
@@ -10,7 +9,7 @@ pipeline {
             steps {
                 script {
                     // Stop the running deployment using pm2
-                    sh 'npm install'
+                    sh 'npm install -g pm2'
                     sh 'pm2 stop react-todo-app'
                 }
             }
