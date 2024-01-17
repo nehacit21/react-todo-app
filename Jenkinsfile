@@ -1,37 +1,34 @@
 pipeline {
-    agent { label "dev-server"}
-    
+    agent any
+
+    tools {
+        nodejs 'your-configured-nodejs'
+    }
+
     stages {
-        
-        stage("code"){
-            steps{
-                git url: "https://github.com/nehacit21/react-todo-app.git", branch: "master"
+        stage('Checkout') {
+            steps {
+                checkout scm
             }
         }
-        stage("build and test"){
-            steps{
-                sh "docker build -t node-app-test-new ."
-            }
-        }
-        stage("scan image"){
-            steps{
-                echo 'image scanning ho gayi'
-            }
-        }
-        stage("push"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker tag node-app-test-new:latest ${env.dockerHubUser}/node-app-test-new:latest"
-                sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
-                echo 'image push ho gaya'
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    sh 'npm install'
+                    sh 'npm test'
                 }
             }
         }
-        stage("deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
-                echo 'deployment ho gayi'
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Your deployment steps here
+                    // For example, you can use pm2 to start the app
+                    sh 'npm install -g pm2'
+                    sh 'pm2 start server.js'
+                }
             }
         }
     }
