@@ -1,50 +1,37 @@
 pipeline {
-    agent any
-
+    agent { label "dev-server"}
+    
     stages {
-        stage('Stop Deployment') {
-            steps {
-                script {
-                    // Stop the running deployment using pm2
-                    sh 'pm2 stop react-todo-app'
+        
+        stage("code"){
+            steps{
+                git url: "https://github.com/nehacit21/react-todo-app.git", branch: "master"
+            }
+        }
+        stage("build and test"){
+            steps{
+                sh "docker build -t node-app-test-new ."
+            }
+        }
+        stage("scan image"){
+            steps{
+                echo 'image scanning ho gayi'
+            }
+        }
+        stage("push"){
+            steps{
+                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker tag node-app-test-new:latest ${env.dockerHubUser}/node-app-test-new:latest"
+                sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
+                echo 'image push ho gaya'
                 }
             }
         }
-
-        stage('Pull Fresh Code') {
-            steps {
-                script {
-                    // Navigate to the project directory
-                    dir('/opt/checkout/react-todo-add') {
-                        // Pull fresh code from Git
-                        sh 'git pull origin master'
-                    }
-                }
-            }
-        }
-
-        stage('Build Project') {
-            steps {
-                script {
-                    // Navigate to the project directory
-                    dir('/opt/checkout/react-todo-add') {
-                        // Install dependencies and build
-                        sh 'npm install'
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
-
-        stage('Deploy using pm2') {
-            steps {
-                script {
-                    // Move build files to deployment folder
-                    sh 'cp -r /opt/checkout/react-todo-add/build/* /opt/deployment/react/'
-
-                    // Start or restart the application using pm2
-                    sh 'pm2 startOrRestart /opt/deployment/react/server.js --name react-todo-app'
-                }
+        stage("deploy"){
+            steps{
+                sh "docker-compose down && docker-compose up -d"
+                echo 'deployment ho gayi'
             }
         }
     }
