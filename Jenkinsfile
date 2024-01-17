@@ -1,8 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        export PM2_HOME="/home/nodejs/.pm2"
     }
     stages {
         stage('Stop Deployment') {
