@@ -1,6 +1,9 @@
 pipeline {
     agent any
 
+    environment {
+        PATH = "/usr/bin/node:/usr/bin/npm:$PATH"
+    }
     stages {
         stage('Stop Deployment') {
             steps {
