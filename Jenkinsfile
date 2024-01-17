@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/bin/node:/usr/bin/npm:$PATH"
+        export PATH=/usr/bin:$PATH
+        export PM2_HOME="/home/nodejs/.pm2"
     }
     stages {
         stage('Stop Deployment') {
